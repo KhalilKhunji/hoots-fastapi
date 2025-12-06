@@ -1,12 +1,17 @@
 from fastapi import FastAPI
-from controllers.teas import router as TeasRouter
-from controllers.users import router as UsersRouter  # Import users router
+from controllers.users import router as UsersRouter
+from controllers.hoots import router as HootsRouter  # NEW
 
-app = FastAPI()
+app = FastAPI(
+    title="Hoot API",
+    description="A blogging platform API built with FastAPI",
+    version="1.0.0"
+)
 
-app.include_router(TeasRouter, prefix="/api")
-app.include_router(UsersRouter, prefix="/api")  # Include users router
+# Register routers
+app.include_router(UsersRouter, prefix="/api", tags=["Users"])
+app.include_router(HootsRouter, prefix="/api", tags=["Hoots"])  # NEW
 
 @app.get('/')
 def home():
-    return 'Hello World!'
+    return {'message': 'Welcome to Hoot API! Visit /docs for API documentation.'}

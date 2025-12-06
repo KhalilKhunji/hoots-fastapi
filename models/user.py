@@ -4,7 +4,9 @@ from passlib.context import CryptContext
 from datetime import datetime, timezone, timedelta
 import jwt
 from config.environment import secret
-from sqlalchemy.orm import relationship # add relationship
+from models.hoot import HootModel
+from models.comment import CommentModel
+from sqlalchemy.orm import relationship
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -18,8 +20,8 @@ class UserModel(BaseModel):
     email = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=True)
 
-    # NEW: Relationship - a user can have multiple teas
-    teas = relationship('TeaModel', back_populates='user')
+    hoots = relationship('HootModel', back_populates='user', cascade='all, delete-orphan')
+    comments = relationship('CommentModel', back_populates='user', cascade='all, delete-orphan')
 
     def set_password(self, password: str):
         self.password_hash = pwd_context.hash(password)
@@ -31,7 +33,7 @@ class UserModel(BaseModel):
         payload = {
             "exp": datetime.now(timezone.utc) + timedelta(days=1),
             "iat": datetime.now(timezone.utc),
-            "sub": self.id,
+            "sub": str(self.id),
         }
 
         token = jwt.encode(payload, secret, algorithm="HS256")

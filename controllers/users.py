@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.user import UserModel
-from serializers.user import UserSchema, UserLogin, UserToken # Add new serializers for login
+from serializers.user import UserSchema, UserResponseSchema, UserLogin, UserToken # Add new serializers for login
 from database import get_db
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserSchema)
+@router.post("/register", response_model=UserResponseSchema)
 def create_user(user: UserSchema, db: Session = Depends(get_db)):
     # Check if the username or email already exists
     existing_user = db.query(UserModel).filter(

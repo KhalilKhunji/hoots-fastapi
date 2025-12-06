@@ -1,14 +1,19 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime, timezone
 from .base import BaseModel
 
 class CommentModel(BaseModel):
+    __tablename__ = "comments"
 
-    __tablename__ = "comments"  # The name of the table in the database
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    id = Column(Integer, primary_key=True, index=True)  # Unique identifier for the comment
-    content = Column(String, nullable=False)  # The text content of the comment
+    # Foreign keys
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    hoot_id = Column(Integer, ForeignKey('hoots.id', ondelete='CASCADE'), nullable=False)
 
-    # ForeignKey establishes a connection to the teas table
-    tea_id = Column(Integer, ForeignKey('teas.id'), nullable=False)
-    tea = relationship("TeaModel", back_populates="comments")  # Defines the relationship to the TeaModel
+    # Relationships
+    user = relationship('UserModel', back_populates='comments')
+    hoot = relationship('HootModel', back_populates='comments')
